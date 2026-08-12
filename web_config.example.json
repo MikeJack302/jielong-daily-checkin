@@ -1,0 +1,38 @@
+{
+  "login_url": "https://i.jielong.com/",
+  "target_url": "",
+  "target_title": "Your exact activity title",
+  "active_from": "2026-01-01",
+  "active_until": "2026-12-31",
+  "success_markers": [
+    "今日已打卡",
+    "今天已打卡",
+    "今日打卡完成",
+    "已完成今日打卡",
+    "打卡成功",
+    "提交成功"
+  ],
+  "primary_buttons": [
+    "立即打卡",
+    "去打卡",
+    "参与打卡",
+    "我要打卡",
+    "今日打卡"
+  ],
+  "quick_fill_buttons": [
+    "快速填充上一次内容",
+    "填充上次内容"
+  ],
+  "submit_buttons": [
+    "立即打卡",
+    "确认打卡",
+    "提交打卡",
+    "确认提交",
+    "提交"
+  ],
+  "confirmation_buttons": [
+    "确认打卡",
+    "确认提交"
+  ],
+  "verify_timeout_seconds": 20
+}
