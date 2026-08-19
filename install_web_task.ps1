@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string[]]$Times = @("06:00"),
+    [string[]]$Times = @("06:00", "06:15", "06:35", "07:00", "07:30", "08:00"),
     [string]$TaskName = "Jielong-Daily-Web-Checkin",
     [string]$TargetTitle = "",
     [string]$ActiveFrom = "",
@@ -82,23 +82,28 @@ if (-not $SkipSetup) {
     }
 }
 
-$Arguments = '"{0}"' -f $CheckinScript
+$NotBefore = ($ParsedTimes | Sort-Object | Select-Object -First 1).ToString("HH:mm")
+$Arguments = '"{0}" --not-before {1}' -f $CheckinScript, $NotBefore
 $Action = New-ScheduledTaskAction `
     -Execute $PythonExe `
     -Argument $Arguments `
     -WorkingDirectory $ScriptDir
 
-$Triggers = foreach ($Parsed in $ParsedTimes) {
+$CurrentUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name
+$DailyTriggers = foreach ($Parsed in $ParsedTimes) {
     New-ScheduledTaskTrigger -Daily -At $Parsed
 }
+$LogonTrigger = New-ScheduledTaskTrigger -AtLogOn -User $CurrentUser
+$Triggers = @($DailyTriggers) + @($LogonTrigger)
 
 $Settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
+    -WakeToRun `
     -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries `
-    -MultipleInstances IgnoreNew
+    -MultipleInstances IgnoreNew `
+    -ExecutionTimeLimit (New-TimeSpan -Minutes 15)
 
-$CurrentUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name
 $Principal = New-ScheduledTaskPrincipal `
     -UserId $CurrentUser `
     -LogonType Interactive `
@@ -110,9 +115,11 @@ Register-ScheduledTask `
     -Trigger $Triggers `
     -Settings $Settings `
     -Principal $Principal `
-    -Description "Jielong web check-in. Reuses a local browser session after initial QR login." `
+    -Description "Jielong web check-in with post-06:00 retry windows and an after-logon catch-up." `
     -Force | Out-Null
 
 Write-Host "Scheduled task created: $TaskName"
 Write-Host "Daily run times: $($Times -join ', ')"
+Write-Host "Catch-up: runs after Windows logon when it is past $NotBefore"
+Write-Host "Retry behavior: a later time automatically checks again when an earlier run fails."
 Write-Host "Log directory: $(Join-Path $ScriptDir 'logs')"
