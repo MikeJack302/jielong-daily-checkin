@@ -5,6 +5,7 @@ logs/
 __pycache__/
 tests/__pycache__/
 web_config.json
+.web-checkin.lock
 
 # Legacy local-only implementation. The public package uses the web version.
 checkin.py

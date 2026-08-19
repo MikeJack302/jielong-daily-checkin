@@ -34,5 +34,12 @@
     "确认打卡",
     "确认提交"
   ],
+  "radio_option": "",
+  "other_text": "",
+  "daily_quotes": [],
+  "headless": false,
+  "navigation_attempts": 3,
+  "navigation_retry_seconds": 4,
+  "reauth_wait_seconds": 300,
   "verify_timeout_seconds": 20
 }
